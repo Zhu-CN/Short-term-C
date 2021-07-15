@@ -9,25 +9,25 @@
 typedef struct user//ÓÃ»§ĞÅÏ¢
 {
 	char identity_number[20];//Éí·İÖ¤ºÅ
-	char name[20];
-	char password[20];
+	char name[20];//ĞÕÃû
+	char password[20];//ÃÜÂë
 	int type;//0ÎªÆÕÍ¨ÓÃ»§,1Îª¹¤×÷ÈËÔ±£¬2Îª¹ÜÀíÔ±
-	struct User* next;
+	struct user* next;
 }User;
 typedef struct price//ÎïÆ·ÍêË°¼Û¸ñ
 {
 	int number;//Ë°ºÅ
-	char name[30];
+	char name[30];//ÎïÆ·Ãû³Æ
 	char unit[20];//µ¥Î»
 	float price;//ÍêË°¼Û¸ñ
 	int tariff;//Ë°ÂÊ°Ù·ÖÂÊ
-	struct price* upper;//¸¸½áµãËùÔÚÁ´±íÍ·Ö¸Õë
-	struct price* lower;//×Ó½áµãËùÔÚÁ´±íÍ·Ö¸Õë
-	struct price* next;
+	struct price* upper;//¸¸½áµãËùÔÚÁ´±íÍ·Ö¸Õë£¬ÓÃÓÚÊä³ö²Ëµ¥
+	struct price* lower;//×Ó½áµãËùÔÚÁ´±íÍ·Ö¸Õë£¬ÓÃÓÚÊä³ö²Ëµ¥
+	struct price* next;//ÏÂÒ»½áµã
 }Price;
 typedef struct list//Éê±¨ÁĞ±í
 {
-	long number;//Éê±¨ºÅ
+	long number;//Éê±¨ºÅ£¬Êı¾İÎª1970Äê1ÔÂ1ÈÕ0:00µ½ÏµÍ³Ê±¼äµÄÃëÊı
 	int price_number;//Ë°ºÅ
 	char name[30];//ÎïÆ·Ãû³Æ
 	char unit[20];//µ¥Î»
@@ -36,16 +36,15 @@ typedef struct list//Éê±¨ÁĞ±í
 	char user_number[20];//ÓÃ»§Éí·İÖ¤ºÅ
 	char user_name[20];//ÓÃ»§ĞÕÃû
 	int status;//Éê±¨×´Ì¬£¬0Îª´ıÊÜÀí£¬1ÎªÍ¨¹ı£¬2ÎªÍË»Ø£¬3ÎªÏú»Ù
-	struct list* next;
+	struct list* next;//ÏÂÒ»½áµã
 }List;
 User* read_user();
-User* sign_in(User* head);
+User* sign_in(int i, User* head);
 User* sign_up(int n, User* head);
 User* user_set_up(User* p, User* head);
 User* logout(char num[], User* head);
 User* del_user(User* head);
 Price* read_price();
-Price* search_price(int num, Price* head);
 Price* goods_choose(Price* head);
 List* read_list();
 List* goods_add(User* up, Price* pp, List* head);
@@ -59,26 +58,32 @@ void goods_fprint(List* head);
 void type_user(User* up, User* u_head, Price* p_head, List* l_head);
 void type_staff(User* up, User* u_head, Price* p_head, List* l_head);
 void type_admin(User* up, User* u_head, Price* p_head, List* l_head);
+char* str_rand(int n);
 int main()
 {
-	int i;
+	int i = 1;
 	User* u_head, * user;
 	Price* p_head;
 	List* l_head;
 	u_head = read_user();
 	p_head = read_price();
 	l_head = read_list();
-	for (;;)
+	while (i != 0)
 	{
 		system("cls");
-		printf("»¶Ó­Ê¹ÓÃº£¹Ø¸öÈËÓÊ¼ÄÎïÆ·µÄÉê±¨¼°Ñé·ÅÏµÍ³£¬ÇëµÇÂ¼»ò×¢²á¡£\n");
-		printf("1.µÇÂ¼  2.×¢²á\nÇëÑ¡Ôñ£º");
+		printf("\t\t»¶Ó­Ê¹ÓÃº£¹Ø¸öÈËÓÊ¼ÄÎïÆ·µÄÉê±¨¼°Ñé·ÅÏµÍ³£¬ÇëµÇÂ¼»ò×¢²á¡£\n");
+		printf("\t\t********************************************************\n");
+		printf("\t\t*                       1.µÇ  Â¼                       *\n");
+		printf("\t\t*                       2.×¢  ²á                       *\n");
+		printf("\t\t*                   3.ÍË  ³ö  Ïµ  Í³                   *\n");
+		printf("\t\t********************************************************\n");
+		printf("\t\tÇëÑ¡Ôñ¹¦ÄÜ£º");
 		scanf("%d", &i);
 		getchar();
 		switch (i)
 		{
 		case 1:
-			user = sign_in(u_head);
+			user = sign_in(0, u_head);
 			switch (user->type)
 			{
 			case 0:
@@ -95,8 +100,8 @@ int main()
 		case 2:
 			u_head = sign_up(0, u_head);
 			break;
-		case 3:
-			exit(0);
+		case 0:
+			break;
 		default:
 			printf("ÊäÈë´íÎó£¬ÇëÖØĞÂÊäÈë¡£");
 			break;
@@ -104,13 +109,14 @@ int main()
 	}
 	return 0;
 }
-User* read_user()//½«ÓÃ»§ÁĞ±í¶ÁÈ¡µ½µ¥Á´±íÖĞ²¢·µ»ØÍ·Ö¸Õë
+User* read_user()//¶ÁÈ¡ÓÃ»§ÎÄ¼ş£¬·µ»ØÍ·½áµã
 {
-	User* p, * head = NULL, * rear;
+	User* p, * head = NULL, * rear = NULL;
 	FILE* fp;
 	while ((fp = fopen("user_list", "rb")) == NULL)
 	{
 		printf("ÓÃ»§ÁĞ±í³õÊ¼»¯Ê§°Ü£¬ÇëÉèÖÃ¹ÜÀíÔ±ÕËºÅ¡£");
+		system("pause");
 		sign_up(2, head);
 	}
 	while (!feof(fp))
@@ -124,52 +130,83 @@ User* read_user()//½«ÓÃ»§ÁĞ±í¶ÁÈ¡µ½µ¥Á´±íÖĞ²¢·µ»ØÍ·Ö¸Õë
 		rear = p;
 	}
 	rear->next = NULL;
+	fclose(fp);
 	return head;
 }
-User* sign_in(User* head)//µÇÂ¼£¬·µ»ØÓÃ»§½áµãÖ¸Õë
+User* sign_in(int i, User* head)//µÇÂ¼£¬²ÎÊı£¨µÇÂ¼´ÎÊı£¬ÓÃ»§Í·½áµã£©£¬·µ»ØµÇÂ¼ÓÃ»§½áµã
 {
 	User* p;
-	char identity_number[20], password[20], c;
-	while (1)
+	char identity_number[20], password[20], * str, str1[5];
+	system("cls");
+	p = head;
+	printf("\t\t**************************µÇ  Â¼**************************\n");
+	printf("\t\tÉí·İÖ¤ºÅ£º");
+	gets(identity_number);
+	printf("\t\tÃÜÂë£º");
+	get_password(password);
+	if (i >= 3)
 	{
-		p = head;
-		printf("Éí·İÖ¤ºÅ£º");
-		gets(identity_number);
-		printf("ÃÜÂë£º");
-		get_password(password);
-		while (p != NULL)
+		str = str_rand(4);
+		printf("\n\t\tÑéÖ¤Âë£º%s\n", str);
+		printf("\t\tÇëÊäÈëÑéÖ¤Âë£º");
+		gets(str1);
+		if ((strcmp(str, str1)) != 0)
 		{
-			if ((strcmp(p->identity_number, identity_number)) == 0)
-			{
-				if ((strcmp(p->password, password)) == 0)
-				{
-					printf("µÇÂ¼³É¹¦£¡");
-					return p;
-				}
-				else
-				{
-					printf("ÃÜÂë´íÎó£¬ÇëÖØĞÂµÇÂ¼¡£");
-					break;
-				}
-			}
-			p = p->next;
-		}
-		if (p == NULL)
-		{
-			printf("Éí·İÖ¤ºÅ´íÎó£¬°´¡°y¡±×¢²á£¬°´ÈÎÒâ¼üÖØĞÂµÇÂ¼¡£\n");
-			c = getchar();
-			if (c == 'y')
-				head = sign_up(0, head);
+			printf("\t\tÑéÖ¤Âë´íÎó£¬ÇëÖØĞÂµÇÂ¼¡£\n");
+			system("pause");
+			return sign_in(i + 1, head);
 		}
 	}
+	while (p != NULL)
+	{
+		if ((strcmp(p->identity_number, identity_number)) == 0)
+		{
+			if ((strcmp(p->password, password)) == 0)
+			{
+				printf("µÇÂ¼³É¹¦£¡\n");
+				system("pause");
+				return p;
+			}
+			else
+			{
+				printf("ÃÜÂë´íÎó£¬ÇëÖØĞÂµÇÂ¼¡£\n");
+				system("pause");
+				break;
+			}
+		}
+		p = p->next;
+	}
+	if (p == NULL)
+	{
+		printf("Éí·İÖ¤ºÅ´íÎó£¬°´¡°y¡±×¢²á£¬°´ÈÎÒâ¼üÖØĞÂµÇÂ¼¡£\n");
+		if (getchar() == 'y')
+			head = sign_up(0, head);
+	}
+	return sign_in(i + 1, head);
 }
-User* sign_up(int n, User* head)//×¢²á£¬·µ»ØÍ·Ö¸Õë
+User* sign_up(int n, User* head)//×¢²á£¬²ÎÊı£¨ÓÃ»§ÀàĞÍ£¬ÓÃ»§Í·½áµã£©£¬·µ»ØÍ·½áµã
 {
 	User* p, * p1;
 	FILE* fp;
 	fp = fopen("user_list", "ab");
 	p = head;
-	p1 = (struct User*)malloc(L_User);
+	p1 = (User*)malloc(L_User);
+	system("cls");
+	printf("\t\t**************************×¢  ²á**************************\n");
+	printf("\t\tÉí·İÖ¤ºÅ£º");
+	gets(p1->identity_number);
+	if (strlen(p1->identity_number) != 18)
+	{
+		printf("\t\tÉí·İÖ¤ºÅ³¤¶È²»ºÏ·¨£¬ÇëÖØĞÂÊäÈë¡£");
+		system("pause");
+		return sign_up(n, head);
+	}
+	printf("\t\tĞÕÃû£º");
+	gets(p1->name);
+	printf("\t\tÃÜÂë£º");
+	get_password(p1->password);
+	p1->type = n;
+	p1->next = NULL;
 	if (head != NULL)
 	{
 		while (p->next != NULL)
@@ -178,21 +215,15 @@ User* sign_up(int n, User* head)//×¢²á£¬·µ»ØÍ·Ö¸Õë
 	}
 	else
 		head = p1;
-	printf("Éí·İÖ¤ºÅ£º");
-	gets(p1->identity_number);
-	printf("ĞÕÃû£º");
-	gets(p1->name);
-	printf("ÃÜÂë£º");
-	get_password(p1->password);
-	p1->type = n;
-	p1->next = NULL;
 	fwrite(p1, L_User, 1, fp);
-	printf("×¢²á³É¹¦£¡");
+	printf("\t\t×¢²á³É¹¦£¡\n");
+	system("pause");
 	fclose(fp);
-	return(head);
+	return head;
 }
-User* user_set_up(User* p, User* head)//²ÎÊıÎªµ±Ç°ÓÃ»§½áµãÖ¸Õë£¬·µ»ØÍ¬ÉÏ
+User* user_set_up(User* p, User* head)//¸öÈËĞÅÏ¢²é¿´¼°ĞŞ¸Ä£¬²ÎÊı£¨µ±Ç°ÓÃ»§½áµã£¬ÓÃ»§Í·½áµã£©£¬·µ»Øµ±Ç°ÓÃ»§½áµã
 {
+	system("cls");
 	printf("µ±Ç°ÓÃ»§ĞÅÏ¢£º");
 	printf("ĞÕÃû£º%s\n", p->name);
 	printf("Éí·İÖ¤ºÅ£º%s\n", p->identity_number);
@@ -210,16 +241,18 @@ User* user_set_up(User* p, User* head)//²ÎÊıÎªµ±Ç°ÓÃ»§½áµãÖ¸Õë£¬·µ»ØÍ¬ÉÏ
 		break;
 	}
 	printf("1.ĞŞ¸Ä¸öÈËĞÅÏ¢  2.×¢ÏúÕË»§  °´ÈÎÒâ¼ü·µ»Ø\n");
-	switch ((getchar()))
+	switch (getchar())
 	{
 	case '1':
+		getchar();
 		printf("Éí·İÖ¤ºÅ£º");
 		gets(p->identity_number);
 		printf("ĞÕÃû£º");
 		gets(p->name);
 		printf("ÃÜÂë£º");
-		gets(p->password);
+		get_password(p->password);
 		printf("ĞŞ¸Ä³É¹¦£¡");
+		system("pause");
 		break;
 	case '2':
 		head = logout(p->identity_number, head);
@@ -229,7 +262,7 @@ User* user_set_up(User* p, User* head)//²ÎÊıÎªµ±Ç°ÓÃ»§½áµãÖ¸Õë£¬·µ»ØÍ¬ÉÏ
 	}
 	return p;
 }
-User* logout(char num[], User* head)//×¢ÏúÕË»§£¬·µ»ØÍ·Ö¸Õë
+User* logout(char num[], User* head)//×¢ÏúÕË»§£¬²ÎÊı£¨×¢ÏúÕË»§Éí·İÖ¤ºÅ£¬ÓÃ»§Í·½áµã£©£¬·µ»ØÓÃ»§Í·½áµã
 {
 	User* p, * p1;
 	p = head;
@@ -246,24 +279,24 @@ User* logout(char num[], User* head)//×¢ÏúÕË»§£¬·µ»ØÍ·Ö¸Õë
 	user_fprintf(head);
 	return head;
 }
-User* del_user(int n, User* head)//Êä³öÓÃ»§ÁĞ±í£¬Ñ¡Ôñ·µ»ØÍ·Ö¸Õë
+User* del_user(User* head)//É¾³ıÓÃ»§£¬²ÎÊı£¨ÓÃ»§Í·½áµã£©£¬·µ»ØÓÃ»§Í·½áµã
 {
 	char num[20];
 	User* p;
 	p = head;
+	system("cls");
 	while (p != NULL)
 	{
-		if (p->type == n)
-			printf("%d %s\n", p->identity_number, p->name);
+		if (p->type == 1)
+			printf("%s %s\n", p->identity_number, p->name);
 		p = p->next;
 	}
 	printf("ÇëÊäÈëĞèÒªÉ¾³ıÓÃ»§µÄÉí·İÖ¤ºÅ£º");
 	gets(num);
-	p = head;
 	head = logout(num, head);
 	return head;
 }
-Price* read_price()//½«ÎïÆ·ÍêË°¼Û¸ñ¶ÁÈ¡µ½Á´±íÖĞ²¢·µ»ØÍ·Ö¸Õë
+Price* read_price()//¶ÁÈ¡ÍêË°¼Û¸ñÎÄ¼ş£¬·µ»ØÍêË°¼Û¸ñÍ·½áµã
 {
 	Price* p, * head = NULL, * p1 = NULL, * p2 = NULL, * p3 = NULL, * p4 = NULL, * p5 = NULL;
 	FILE* fp;
@@ -274,9 +307,13 @@ Price* read_price()//½«ÎïÆ·ÍêË°¼Û¸ñ¶ÁÈ¡µ½Á´±íÖĞ²¢·µ»ØÍ·Ö¸Õë
 	}
 	while (!feof(fp))
 	{
-		p = (struct Price*)malloc(L_Price);
+		p = (Price*)malloc(L_Price);
 		p->lower = NULL;
-		fscanf(fp, "%d%s%s%f%d", &p->number, p->name, p->unit, &p->price, &p->tariff);
+		if ((fscanf(fp, "%d%s%s%f%d", &p->number, p->name, p->unit, &p->price, &p->tariff)) == -1)
+		{
+			free(p);
+			break;
+		}
 		if ((p->number / 10000) % 10 == 0)//ÅĞ¶ÏÊÇ·ñÎªÒ»¼¶²Ëµ¥
 		{
 			if (head == NULL)
@@ -357,46 +394,45 @@ Price* read_price()//½«ÎïÆ·ÍêË°¼Û¸ñ¶ÁÈ¡µ½Á´±íÖĞ²¢·µ»ØÍ·Ö¸Õë
 		}
 	}
 	p1->next = NULL;
+	fclose(fp);
 	return head;
 }
-Price* search_price(int num, Price* head)//±éÀúÁ´±í£¬·µ»ØË°ºÅËùÔÚ½áµã
-{
-	Price* p;
-	p = head;
-	while (p != NULL)
-	{
-		if (num = p->number)
-			return p;
-		p = p->next;
-	}
-	return NULL;
-}
-Price* goods_choose(Price* head)//Éê±¨ÎïÆ·£¬·µ»ØÖ¸Õë
+Price* goods_choose(Price* head)//Éê±¨ÎïÆ·Ñ¡Ôñ£¬²ÎÊı£¨ÍêË°¼Û¸ñÍ·½áµã£©£¬·µ»ØÉê±¨ÎïÆ·Í·½áµã
 {
 	Price* p;
 	p = head;
 	int num;
 	goods_menu(p);
-	printf("ÇëÊäÈëËùÑ¡ÔñË°ºÅ£º£¨ÊäÈë0·µ»ØÉÏÒ»¼¶²Ëµ¥£©");
+	printf("\nÇëÊäÈëËùÑ¡ÔñË°ºÅ£º£¨ÊäÈë0·µ»ØÉÏÒ»¼¶²Ëµ¥£©");
 	scanf("%d", &num);
-	while (num != p->number)
-		p = p->next;
 	if (num == 0)
 		if (p->upper == NULL)
+		{
 			printf("ÒÑÊÇ×î¸ß¼¶²Ëµ¥¡£\n");
+			return;
+		}
 		else
-			return(goods_choose(p->upper));
+			return goods_choose(p->upper);
+	while (p != NULL)
+	{
+		if (num == p->number)
+			break;
+		else
+			p = p->next;
+	}
+	if (p == NULL)
+	{
+		printf("Ë°ºÅÊäÈë´íÎó£¬ÇëÖØĞÂÊäÈë¡£\n");
+		system("pause");
+	}
 	else
-		if ((search_price(num, head)) == NULL)
-			printf("Ë°ºÅÊäÈë´íÎó£¬ÇëÖØĞÂÊäÈë¡£\n");
+		if (p->lower == NULL)
+			return p;
 		else
-			if (p->lower == NULL)
-				return p;
-			else
-				return(goods_choose(p->lower));
-	return(goods_choose(head));
+			return goods_choose(p->lower);
+	return goods_choose(head);
 }
-List* read_list()//½«Éê±¨ÁĞ±í¶ÁÈ¡µ½µ¥Á´±íÖĞ²¢·µ»ØÍ·Ö¸Õë
+List* read_list()//¶ÁÈ¡Éê±¨ÁĞ±íÎÄ¼ş£¬·µ»ØÉê±¨ÁĞ±íÍ·½áµã
 {
 	List* p, * head = NULL, * rear;
 	FILE* fp;
@@ -408,7 +444,7 @@ List* read_list()//½«Éê±¨ÁĞ±í¶ÁÈ¡µ½µ¥Á´±íÖĞ²¢·µ»ØÍ·Ö¸Õë
 	while (!feof(fp))
 	{
 		p = (List*)malloc(L_List);
-		if ((fscanf(fp, "%ld%d%s%s%f%f%s%s", &p->number, &p->price_number, p->name, p->unit, &p->quantity, &p->price, p->user_number, p->name)) == -1)
+		if ((fscanf(fp, "%ld%d%s%s%f%f%s%s%d", &p->number, &p->price_number, p->name, p->unit, &p->quantity, &p->price, p->user_number, p->name, &p->status)) == -1)
 		{
 			free(p);
 			break;
@@ -421,9 +457,10 @@ List* read_list()//½«Éê±¨ÁĞ±í¶ÁÈ¡µ½µ¥Á´±íÖĞ²¢·µ»ØÍ·Ö¸Õë
 	}
 	if (head != NULL)
 		rear->next = NULL;
+	fclose(fp);
 	return head;
 }
-List* goods_add(User* up, Price* pp, List* head)//Ìí¼ÓÉê±¨ÁĞ±íÏîÄ¿,·µ»ØÍ·Ö¸Õë
+List* goods_add(User* up, Price* pp, List* l_head)//Ìí¼ÓÉê±¨ÁĞ±íÏîÄ¿,²ÎÊı£¨ÓÃ»§½áµã£¬ÍêË°¼Û¸ñÍ·½áµã£¬Éê±¨ÁĞ±íÍ·½áµã£©£¬·µ»ØÉê±¨ÁĞ±íÍ·½áµã
 {
 	List* p, * p1;
 	FILE* fp;
@@ -432,7 +469,7 @@ List* goods_add(User* up, Price* pp, List* head)//Ìí¼ÓÉê±¨ÁĞ±íÏîÄ¿,·µ»ØÍ·Ö¸Õë
 		printf("´ò¿ªÉê±¨ÁĞ±íÎÄ¼şÊ§°Ü£¬ÇëÌí¼ÓºóÖØĞÂ´ò¿ª³ÌĞò¡£");
 		exit(0);
 	}
-	p = (struct List*)malloc(L_List);
+	p = (List*)malloc(L_List);
 	printf("ÇëÊäÈëÊıÁ¿£º(%s)", pp->unit);
 	scanf("%f", &p->quantity);
 	if (pp->price == 0)
@@ -443,28 +480,28 @@ List* goods_add(User* up, Price* pp, List* head)//Ìí¼ÓÉê±¨ÁĞ±íÏîÄ¿,·µ»ØÍ·Ö¸Õë
 	}
 	else
 		p->price = p->quantity * pp->price;
-	p->number = time(NULL);
+	p->number = (long)time(NULL);
 	p->status = 0;
 	p->price_number = pp->number;
 	strcpy(p->name, pp->name);
 	strcpy(p->unit, pp->unit);
 	strcpy(p->user_name, up->name);
 	strcpy(p->user_number, up->identity_number);
-	if (head == NULL)
-		head = p;
+	if (l_head == NULL)
+		l_head = p;
 	else
 	{
-		p1 = head;
+		p1 = l_head;
 		while (p1->next != NULL)
 			p1 = p1->next;
 		p1->next = p;
 	}
 	p->next = NULL;
-	fprintf(fp, "%ld %d %s %s %f %f %s %s\n", p->number, p->price_number, p->name, p->unit, p->quantity, p->price, p->user_number, p->name);
+	fprintf(fp, "%ld %d %s %s %f %f %s %s %d\n", p->number, p->price_number, p->name, p->unit, p->quantity, p->price, p->user_number, p->name, p->status);
 	fclose(fp);
-	return(head);
+	return l_head;
 }
-void get_password(char pw[])//ÃÜÂëÊäÈë
+void get_password(char pw[])//ÃÜÂëÊäÈë£¬²ÎÊı£¨´ıÊäÈëÃÜÂë£©
 {
 	int i = 0;
 	while ((pw[i] = getch()) != '\r')
@@ -485,13 +522,12 @@ void get_password(char pw[])//ÃÜÂëÊäÈë
 	}
 	pw[i] = '\0';
 }
-void user_fprintf(User* head)//Êä³öÓÃ»§ÁĞ±íµ½ÎÄ¼ş
+void user_fprintf(User* head)//Êä³öÓÃ»§ÁĞ±íµ½ÎÄ¼ş£¬²ÎÊı£¨ÓÃ»§Í·½áµã£©
 {
 	User* p;
 	FILE* fp;
 	p = head;
-	remove("user_list");
-	if ((fp = fopen("user_list", "wb")) == NULL)
+	if ((fp = fopen("user_list1", "wb")) == NULL)
 	{
 		printf("´ò¿ªÓÃ»§ÁĞ±íÎÄ¼şÊ§°Ü£¬ÇëÌí¼ÓºóÖØĞÂ´ò¿ª³ÌĞò¡£");
 		exit(0);
@@ -502,28 +538,37 @@ void user_fprintf(User* head)//Êä³öÓÃ»§ÁĞ±íµ½ÎÄ¼ş
 		p = p->next;
 	}
 	fclose(fp);
+	remove("user_list");
+	rename("user_list1", "user_list");
 }
-void goods_menu(Price* head)//ÎïÆ·²Ëµ¥
+void goods_menu(Price* head)//ÎïÆ·²Ëµ¥£¬£¨ÎïÆ·Í·½áµã£©
 {
+	int i = 0;
 	Price* p;
 	p = head;
+	system("cls");
 	while (p != NULL)
 	{
-		printf("%d %s\n", p->number, p->name);
+		printf("%8d:%-30s", p->number, p->name);
 		p = p->next;
+		i++;
+		if (i % 2 == 0)
+			printf("\n");
 	}
 }
-void goods_report(User* up, Price* p_head, List* l_head)//ÎïÆ·Éê±¨
+void goods_report(User* up, Price* p_head, List* l_head)//ÎïÆ·Éê±¨£¬²ÎÊı£¨ÓÃ»§½áµã£¬ÍêË°¼Û¸ñÍ·½áµã£¬Éê±¨ÁĞ±íÍ·½áµã£©
 {
 	Price* pp;
 	pp = goods_choose(p_head);
 	l_head = goods_add(up, pp, l_head);
 	printf("Éê±¨³É¹¦¡£");
+	system("pause");
 }
-void goods_printf(User* up, List* l_head)//Éê±¨ÎïÆ·Êä³ö
+void goods_printf(User* up, List* l_head)//Éê±¨ÎïÆ·Êä³ö£¬²ÎÊı£¨ÓÃ»§½áµã£¬Éê±¨ÁĞ±íÍ·½áµã£©
 {
 	List* lp;
 	lp = l_head;
+	system("cls");
 	while (lp != NULL)
 	{
 		if ((strcmp(lp->user_number, up->identity_number)) == 0 || up->type == 1)
@@ -548,7 +593,7 @@ void goods_printf(User* up, List* l_head)//Éê±¨ÎïÆ·Êä³ö
 		lp = lp->next;
 	}
 }
-void goods_set_up(User* up, List* l_head)//´¦ÀíÉê±¨ÏîÄ¿£¬ÓÃ»§½øĞĞÉ¾³ı£¬¹¤×÷ÈËÔ±½øĞĞ×´Ì¬ĞŞ¸Ä
+void goods_set_up(User* up, List* l_head)//´¦ÀíÉê±¨ÏîÄ¿£¬ÓÃ»§½øĞĞÉ¾³ı£¬¹¤×÷ÈËÔ±½øĞĞ×´Ì¬ĞŞ¸Ä£¬²ÎÊı£¨ÓÃ»§½áµã£¬Éê±¨ÁĞ±íÍ·½áµã£©
 {
 	long num;
 	List* lp, * lp1;
@@ -604,7 +649,7 @@ void goods_set_up(User* up, List* l_head)//´¦ÀíÉê±¨ÏîÄ¿£¬ÓÃ»§½øĞĞÉ¾³ı£¬¹¤×÷ÈËÔ±½
 	}
 	goods_fprint(l_head);
 }
-void goods_fprint(List* head)//Êä³öÉê±¨ÁĞ±íµ½ÎÄ¼ş
+void goods_fprint(List* head)//Êä³öÉê±¨ÁĞ±íµ½ÎÄ¼ş£¬²ÎÊı£¨Éê±¨ÁĞ±íÍ·½áµã£©
 {
 	List* p;
 	FILE* fp;
@@ -616,23 +661,25 @@ void goods_fprint(List* head)//Êä³öÉê±¨ÁĞ±íµ½ÎÄ¼ş
 	}
 	while (p != NULL)
 	{
-		fprintf(fp, "%ld %d %s %s %f %f %s %s\n", p->number, p->price_number, p->name, p->unit, p->quantity, p->price, p->user_number, p->name);
+		fprintf(fp, "%ld %d %s %s %f %f %s %s %d\n", p->number, p->price_number, p->name, p->unit, p->quantity, p->price, p->user_number, p->name, p->status);
 		p = p->next;
 	}
 	fclose(fp);
 }
-void type_user(User* up, User* u_head, Price* p_head, List* l_head)
+void type_user(User* up, User* u_head, Price* p_head, List* l_head)//ÓÃ»§²Ëµ¥
 {
 	int i = 1;
 	while (i != 0)
 	{
 		system("cls");
-		printf("%s£¬»¶Ó­Ê¹ÓÃº£¹Ø¸öÈËÓÊ¼ÄÎïÆ·Éê±¨\n", up->name);
-		printf("1.ÓÊµİÎïÆ·Éê±¨\n");
-		printf("2.Éê±¨×´Ì¬²éÑ¯\n");
-		printf("3.¸öÈËĞÅÏ¢²éÑ¯\n");
-		printf("0.ÍË³öµÇÂ¼\n");
-		printf("ÇëÑ¡Ôñ¹¦ÄÜ£º");
+		printf("\t\t%s£¬»¶Ó­Ê¹ÓÃº£¹Ø¸öÈËÓÊ¼ÄÎïÆ·Éê±¨\n", up->name);
+		printf("\t\t********************************************************\n");
+		printf("\t\t*                     1.ÓÊµİÎïÆ·Éê±¨                   *\n");
+		printf("\t\t*                     2.Éê±¨×´Ì¬²éÑ¯                   *\n");
+		printf("\t\t*                     3.¸öÈËĞÅÏ¢²éÑ¯                   *\n");
+		printf("\t\t*                     0. ÍË ³ö µÇ Â¼                   *\n");
+		printf("\t\t********************************************************\n");
+		printf("\t\tÇëÑ¡Ôñ¹¦ÄÜ£º");
 		scanf("%d", &i);
 		getchar();
 		switch (i)
@@ -643,7 +690,7 @@ void type_user(User* up, User* u_head, Price* p_head, List* l_head)
 		case 2:
 			goods_printf(up, l_head);
 			printf("°´yÉ¾³ıÉê±¨£¬°´ÈÎÒâ¼ü·µ»Ø¡£");
-			if ((getchar()) == 'y')
+			if (getchar() == 'y')
 				goods_set_up(up, l_head);
 			break;
 		case 3:
@@ -655,22 +702,25 @@ void type_user(User* up, User* u_head, Price* p_head, List* l_head)
 			return;
 		default:
 			printf("ÊäÈë´íÎó£¬ÇëÖØĞÂÑ¡Ôñ¡£");
+			system("pause");
 			break;
 		}
 	}
 }
-void type_staff(User* up, User* u_head, Price* p_head, List* l_head)
+void type_staff(User* up, User* u_head, Price* p_head, List* l_head)//¹¤×÷ÈËÔ±²Ëµ¥
 {
 	int i = 1;
 	while (i != 0)
 	{
 		system("cls");
-		printf("%s£¬»¶Ó­Ê¹ÓÃº£¹Ø¸öÈËÓÊ¼ÄÎïÆ·Éê±¨\n", up->name);
-		printf("1.Éê±¨ÉóÅú\n");
-		printf("2.Éê±¨ÁĞ±í²éÑ¯\n");
-		printf("3.¸öÈËĞÅÏ¢²éÑ¯\n");
-		printf("0.ÍË³öµÇÂ¼\n");
-		printf("ÇëÑ¡Ôñ¹¦ÄÜ£º");
+		printf("\t\t%s£¬»¶Ó­Ê¹ÓÃº£¹Ø¸öÈËÓÊ¼ÄÎïÆ·Éê±¨\n", up->name);
+		printf("\t\t********************************************************\n");
+		printf("\t\t*                     1. Éê ±¨ Éó Åú                   *\n");
+		printf("\t\t*                     2.Éê±¨ÁĞ±í²éÑ¯                   *\n");
+		printf("\t\t*                     3.¸öÈËĞÅÏ¢²éÑ¯                   *\n");
+		printf("\t\t*                     0. ÍË ³ö µÇ Â¼                   *\n");
+		printf("\t\t********************************************************\n");
+		printf("\t\tÇëÑ¡Ôñ¹¦ÄÜ£º");
 		scanf("%d", &i);
 		getchar();
 		switch (i)
@@ -678,9 +728,11 @@ void type_staff(User* up, User* u_head, Price* p_head, List* l_head)
 		case 1:
 			goods_printf(up, l_head);
 			goods_set_up(up, l_head);
+			system("pause");
 			break;
 		case 2:
 			goods_printf(up, l_head);
+			system("pause");
 			break;
 		case 3:
 			up = user_set_up(up, u_head);
@@ -691,22 +743,25 @@ void type_staff(User* up, User* u_head, Price* p_head, List* l_head)
 			return;
 		default:
 			printf("ÊäÈë´íÎó£¬ÇëÖØĞÂÑ¡Ôñ¡£");
+			system("pause");
 			break;
 		}
 	}
 }
-void type_admin(User* up, User* u_head, Price* p_head, List* l_head)
+void type_admin(User* up, User* u_head, Price* p_head, List* l_head)//¹ÜÀíÔ±²Ëµ¥
 {
 	int i = 1;
 	while (i != 0)
 	{
 		system("cls");
-		printf("%s£¬»¶Ó­Ê¹ÓÃº£¹Ø¸öÈËÓÊ¼ÄÎïÆ·Éê±¨\n", up->name);
-		printf("1.ĞÂÔö¹¤×÷ÈËÔ±\n");
-		printf("2.É¾³ı¹¤×÷ÈËÔ±\n");
-		printf("3.¸öÈËĞÅÏ¢²éÑ¯\n");
-		printf("0.ÍË³öµÇÂ¼\n");
-		printf("ÇëÑ¡Ôñ¹¦ÄÜ£º");
+		printf("\t\t%s£¬»¶Ó­Ê¹ÓÃº£¹Ø¸öÈËÓÊ¼ÄÎïÆ·Éê±¨\n", up->name);
+		printf("\t\t********************************************************\n");
+		printf("\t\t*                     1.×¢²á¹¤×÷ÈËÔ±                   *\n");
+		printf("\t\t*                     2.É¾³ı¹¤×÷ÈËÔ±                   *\n");
+		printf("\t\t*                     3.¸öÈËĞÅÏ¢²éÑ¯                   *\n");
+		printf("\t\t*                     0. ÍË ³ö µÇ Â¼                   *\n");
+		printf("\t\t********************************************************\n");
+		printf("\t\tÇëÑ¡Ôñ¹¦ÄÜ£º");
 		scanf("%d", &i);
 		getchar();
 		switch (i)
@@ -715,7 +770,7 @@ void type_admin(User* up, User* u_head, Price* p_head, List* l_head)
 			u_head = sign_up(1, u_head);
 			break;
 		case 2:
-			u_head = del_user(1, u_head);
+			u_head = del_user(u_head);
 			break;
 		case 3:
 			up = user_set_up(up, u_head);
@@ -726,7 +781,30 @@ void type_admin(User* up, User* u_head, Price* p_head, List* l_head)
 			return;
 		default:
 			printf("ÊäÈë´íÎó£¬ÇëÖØĞÂÑ¡Ôñ¡£");
+			system("pause");
 			break;
 		}
 	}
+}
+char* str_rand(int n)//Éú³ÉËæ»úÑéÖ¤Âë£¬²ÎÊıÎªÑéÖ¤ÂëÎ»Êı
+{
+	int flag, i;
+	char* str;
+	srand((unsigned)time(NULL));
+	str = (char*)malloc((n + 1) * sizeof(char));
+	for (i = 0; i < n; i++)
+	{
+		flag = rand() % 2;
+		switch (flag)
+		{
+		case 0:
+			str[i] = 'A' + rand() % 26;
+			break;
+		case 1:
+			str[i] = 'a' + rand() % 26;
+			break;
+		}
+	}
+	str[n] = '\0';
+	return str;
 }
